@@ -1,1 +1,46 @@
+name: Update News
 
+on:
+  schedule:
+    # Toutes les 6 heures. Ajuster selon la fraîcheur souhaitée.
+    - cron: "0 */1 * * *"
+  workflow_dispatch: {}  # permet un déclenchement manuel depuis l'onglet Actions
+
+# Nécessaire pour que le job puisse pousser un commit sur le dépôt.
+permissions:
+  contents: write
+
+concurrency:
+  group: update-news
+  cancel-in-progress: false
+
+jobs:
+  update-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du dépôt
+        uses: actions/checkout@v4
+
+      - name: Installation de Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installation des dépendances
+        run: pip install -r requirements.txt
+
+      - name: Exécution du script de mise à jour des news
+        id: run_script
+        run: python get_news.py
+
+      - name: Commit et push si des changements ont été générés
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add news_en.json news_fr.json
+          if git diff --staged --quiet; then
+            echo "Aucun changement à commiter."
+          else
+            git commit -m "chore: mise à jour automatique des news [skip ci]"
+            git push
+          fi
