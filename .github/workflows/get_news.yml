@@ -2,8 +2,7 @@ name: Update News
 
 on:
   schedule:
-    # Toutes les 6 heures. Ajuster selon la fraîcheur souhaitée.
-    - cron: "0 */1 * * *"
+    - cron: "0 * * * *"
   workflow_dispatch: {}  # permet un déclenchement manuel depuis l'onglet Actions
 
 # Nécessaire pour que le job puisse pousser un commit sur le dépôt.
